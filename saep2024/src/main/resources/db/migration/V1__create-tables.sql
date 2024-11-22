@@ -1,0 +1,23 @@
+CREATE TABLE usuario(
+    id BIGINT NOT NULL AUTO_INCREMENT,
+
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE tarefa(
+    id BIGINT NOT NULL AUTO_INCREMENT,
+
+    descricao VARCHAR(255) NOT NULL,
+    setor VARCHAR(100) NOT NULL,
+    prioridade VARCHAR(100),
+    status VARCHAR(100) NOT NULL,
+    dataCadastro DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    usuario BIGINT NOT NULL,
+    FOREIGN KEY(usuario) REFERENCES usuario(id),
+
+    PRIMARY KEY (id)
+);
