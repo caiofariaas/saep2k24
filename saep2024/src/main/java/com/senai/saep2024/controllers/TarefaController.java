@@ -1,10 +1,12 @@
 package com.senai.saep2024.controllers;
 
+
 import com.senai.saep2024.dtos.tarefaDtos.TarefaCreateDTO;
 import com.senai.saep2024.dtos.tarefaDtos.TarefaUpdateDTO;
 import com.senai.saep2024.entities.Tarefa;
 import com.senai.saep2024.repositories.TarefaRepository;
 import com.senai.saep2024.services.tarefaServices.CreateTarefaService;
+import com.senai.saep2024.services.tarefaServices.DeleteTarefaService;
 import com.senai.saep2024.services.tarefaServices.UpdateTarefaService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.transaction.Transactional;
@@ -29,6 +31,9 @@ public class TarefaController {
     UpdateTarefaService updateTarefaService;
 
     @Autowired
+    DeleteTarefaService deleteTarefaService;
+
+    @Autowired
     private TarefaRepository tarefaRepository;
 
     @PostMapping
@@ -50,5 +55,13 @@ public class TarefaController {
     @Transactional
     public ResponseEntity<Tarefa> update (@PathVariable Long id, @RequestBody @Valid TarefaUpdateDTO data){
         return ResponseEntity.ok(updateTarefaService.update(id, data));
+    }
+
+    @DeleteMapping("/{id}")
+    @Transactional
+    public ResponseEntity<String> delete (@PathVariable Long id){
+        deleteTarefaService.delete(id);
+
+        return ResponseEntity.ok("Tarefa Deletada!");
     }
 }
