@@ -1,30 +1,129 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import Swal from "sweetalert2";
+import { Tarefa, Usuario } from "./ListaTarefas";
 
-export function CadastroTarefa(): JSX.Element {
+
+interface CadastroTarefaProps {
+  atualizarListaDeTarefas: (novaTarefa: Tarefa) => void;
+}
+
+export function CadastroTarefa({ atualizarListaDeTarefas }: CadastroTarefaProps): JSX.Element {
   const [descricao, setDescricao] = useState<string>("");
   const [setor, setSetor] = useState<string>("");
   const [prioridade, setPrioridade] = useState<string>("BAIXA");
-  const [usuarioEmail, setUsuarioEmail] = useState<string>("");
+  const [usuarioSelecionado, setUsuarioSelecionado] = useState<string>(""); 
+  const [usuarios, setUsuarios] = useState<Usuario[]>([]); 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
+  const getModalWidth = () => {
+    const width = window.innerWidth;
+
+    if (width <= 540) return '95%';
+    if (width <= 680) return '90%';
+    if (width <= 750) return '85%';
+    if (width <= 865) return '75%';
+    if (width <= 1300) return '40%';
+    if (width <= 1500) return '30%';
+    
+    return '30%'; 
+};
+
+  useEffect(() => {
+    if (isModalOpen) {
+      fetchUsuarios();
+    }
+  }, [isModalOpen]);
+
+  const fetchUsuarios = async () => {
+    try {
+      const response = await fetch("http://localhost:8081/usuario");
+      const data = await response.json();
+
+      setUsuarios(data); 
+
+    } catch (error) {
+      console.error("Erro ao buscar usuários:", error);
+    }
+  };
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     const novaTarefa = {
       descricao,
       setor,
       prioridade,
-      usuarioEmail,
+      usuarioEmail: usuarioSelecionado,
     };
     console.log("Tarefa cadastrada:", novaTarefa);
-    // Adicione aqui a lógica para enviar os dados ao backend ou processá-los
 
+    try {
+      const response = await fetch("http://localhost:8081/tarefa", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(novaTarefa),
+      });
+  
+      if (response.ok) {
+
+        const tarefaCadastrada = await response.json();
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Sucesso',
+          text: 'Tarefa cadastrada com sucesso!',
+          showConfirmButton: false,
+          timer: 2000,
+          width: getModalWidth(),
+          customClass: {
+              popup: 'custom-swal-popup', 
+          },
+          background: '#000',
+          color: '#fff',
+      });
+
+      atualizarListaDeTarefas(tarefaCadastrada);
+
+    } 
+    else {
+      Swal.fire({
+        icon: 'error',
+        title: 'Erro',
+        text: 'Erro ao cadastrar a tarefa.',
+        showConfirmButton: false,
+        timer: 2000,
+        width: getModalWidth(),
+        customClass: {
+            popup: 'custom-swal-popup', 
+        },
+        background: '#000',
+        color: '#fff',
+    });      }
+    } 
+    catch (error) {
+      console.error("Erro de conexão:", error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Erro',
+        text: 'Erro ao cadastrar a tarefa.',
+        showConfirmButton: false,
+        timer: 2000,
+        width: getModalWidth(),
+        customClass: {
+            popup: 'custom-swal-popup', 
+        },
+        background: '#000',
+        color: '#fff',
+    });
+    }
 
 
     // Limpa os campos do formulário e fecha o modal
     setDescricao("");
     setSetor("");
     setPrioridade("BAIXA");
-    setUsuarioEmail("");
+    setUsuarioSelecionado("");
     setIsModalOpen(false);
   };
 
@@ -71,14 +170,20 @@ export function CadastroTarefa(): JSX.Element {
                 </select>
               </div>
               <div style={formGroupStyle}>
-                <label htmlFor="usuarioEmail">Usuário (Email):</label>
-                <input
-                  id="usuarioEmail"
-                  type="email"
-                  value={usuarioEmail}
-                  onChange={(e) => setUsuarioEmail(e.target.value)}
+                <label htmlFor="usuario">Usuário:</label>
+                <select
+                  id="usuario"
+                  value={usuarioSelecionado}
+                  onChange={(e) => setUsuarioSelecionado(e.target.value)}
                   required
-                />
+                >
+                  <option value="">Selecione um usuário</option>
+                  {usuarios.map((usuario) => (
+                    <option key={usuario.id} value={usuario.email}>
+                      {usuario.nome} ({usuario.email})
+                    </option>
+                  ))}
+                </select>
               </div>
               <div style={buttonGroupStyle}>
                 <button type="submit">Salvar</button>
@@ -94,7 +199,6 @@ export function CadastroTarefa(): JSX.Element {
   );
 }
 
-// Estilos básicos para o modal e formulário
 const modalStyle: React.CSSProperties = {
   position: "fixed",
   top: 0,

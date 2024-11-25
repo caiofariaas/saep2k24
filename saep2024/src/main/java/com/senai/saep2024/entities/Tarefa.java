@@ -1,6 +1,7 @@
 package com.senai.saep2024.entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.senai.saep2024.dtos.tarefaDtos.TarefaCreateDTO;
 import com.senai.saep2024.entities.enums.PrioridadeEnum;
 import com.senai.saep2024.entities.enums.StatusEnum;
@@ -35,7 +36,7 @@ public class Tarefa {
 
     @ManyToOne
     @JoinColumn(name = "usuario", referencedColumnName = "id")
-    @JsonBackReference
+    @JsonManagedReference
     private Usuario usuario;
 
     public Tarefa(TarefaCreateDTO data){

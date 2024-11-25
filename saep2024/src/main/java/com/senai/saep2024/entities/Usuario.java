@@ -1,6 +1,7 @@
 package com.senai.saep2024.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.senai.saep2024.dtos.usuarioDtos.UsuarioCreateDTO;
 import jakarta.persistence.*;
@@ -28,7 +29,7 @@ public class Usuario {
     private String email;
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
+    @JsonBackReference
     private Set<Tarefa> tarefaSet = new HashSet<>();
 
     public Usuario(UsuarioCreateDTO data) {

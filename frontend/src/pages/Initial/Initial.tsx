@@ -1,6 +1,6 @@
 import { } from "react";
 import { CadastroUsuario } from "./components/CadastroUsuario";
-import { CadastroTarefa } from "./components/CadastroTarefa";
+import { ListaTarefas } from "./components/ListaTarefas";
 
 export function Initial() {
 
@@ -8,7 +8,7 @@ export function Initial() {
     <>
         <div className="cadastros">
             <CadastroUsuario />
-            <CadastroTarefa />
+            <ListaTarefas/>
         </div>
     </>
   );

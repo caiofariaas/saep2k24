@@ -22,6 +22,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/tarefa")
 @Tag(name = "Tarefa", description = "\"API para operações relacionadas as tarefas\"")
+@CrossOrigin(origins = "http://localhost:5173")
 public class TarefaController {
 
     @Autowired

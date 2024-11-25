@@ -1,17 +1,76 @@
 import React, { useState } from "react";
+import Swal from 'sweetalert2';
 
 export function CadastroUsuario(): JSX.Element {
   const [nome, setNome] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
+  const getModalWidth = () => {
+    const width = window.innerWidth;
+
+    if (width <= 540) return '95%';
+    if (width <= 680) return '90%';
+    if (width <= 750) return '85%';
+    if (width <= 865) return '75%';
+    if (width <= 1300) return '40%';
+    if (width <= 1500) return '30%';
+    
+    return '30%'; 
+};
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
-    console.log("Nome:", nome);
-    console.log("Email:", email);
-    // Adicione aqui a lógica para enviar os dados ao backend ou processá-los
+
+    const usuario = { nome, email };
+  
+  try {
+    const response = await fetch("http://localhost:8081/usuario", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(usuario),
+    });
     
-    
+    if (response.ok) {
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Sucesso',
+        text: 'Usuário cadastrado com sucesso!',
+        showConfirmButton: false,
+        timer: 2000,
+        width: getModalWidth(),
+        customClass: {
+            popup: 'custom-swal-popup', 
+        },
+        background: '#000',
+        color: '#fff',
+    });
+
+    } 
+    else {
+      console.error("Erro ao cadastrar o usuário:", response.statusText);
+
+      Swal.fire({
+        icon: 'error',
+        title: 'Erro',
+        text: 'Erro ao cadastrar o usuário.',
+        showConfirmButton: false,
+        timer: 2000,
+        width: getModalWidth(),
+        customClass: {
+            popup: 'custom-swal-popup', 
+        },
+        background: '#000)',
+        color: '#fff',
+    });
+
+    }
+  } catch (error) {
+    console.error("Erro de conexão:", error);
+  }
 
     setNome("");
     setEmail("");
